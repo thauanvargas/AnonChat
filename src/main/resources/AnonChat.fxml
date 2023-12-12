@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="304.0" prefWidth="543.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="extension.AnonChat">
+   <children>
+      <Label fx:id="labelTitleStatus" layoutX="235.0" text="Status:">
+         <font>
+            <Font name="System Bold" size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="labelStatus" layoutX="273.0" text="Offline" textFill="RED">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="195.0" fitWidth="171.0" layoutX="185.0" layoutY="28.0" opacity="0.78" pickOnBounds="true" smooth="false">
+         <Image url="@anonchat.png" />
+      </ImageView>
+      <Label fx:id="labelLog" alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="342.0" prefHeight="25.0" prefWidth="540.0" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <TextField fx:id="anonKeyTextField" layoutX="196.0" layoutY="270.0" />
+      <CheckBox fx:id="toggleCheckbox" layoutX="234.0" layoutY="307.0" mnemonicParsing="false" text="Enable" onAction="#toggleStatus" />
+      <Label layoutX="123.0" layoutY="244.0" text="Type a secret key that only you and your friends will know" />
+      <ListView fx:id="usersInChatListView" layoutX="39.0" layoutY="61.0" prefHeight="162.0" prefWidth="113.0" />
+      <Label layoutX="39.0" layoutY="37.0" text="Users in your chat:" />
+   </children>
+</AnchorPane>

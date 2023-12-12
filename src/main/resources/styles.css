@@ -1,0 +1,66 @@
+.g-dark .table-view {
+    -fx-background-color: rgba(20, 20, 20, 0.4);
+}
+
+.g-dark .table-view .table-cell{
+    -fx-text-fill: #000000;
+}
+
+.g-dark .table-row-cell {
+    -fx-background-color: #313131;
+}
+
+.g-dark .table-view .column-header {
+    -fx-background-color: #212121;
+}
+
+.g-dark .list-view .list-cell{
+    -fx-border-color: #262626;
+    -fx-border-width: 0.5;
+    -fx-text-fill: red;
+
+}
+
+.g-dark .combo-box .list-cell {
+    -fx-background-color: transparent;
+}
+
+.g-dark .list-view {
+    -fx-selection-bar: #000000;
+}
+
+
+.g-light .table-view {
+    -fx-background-color: rgba(20, 20, 20, 0.4);
+}
+
+.g-light .table-view .table-cell{
+    -fx-text-fill: #000000;
+}
+
+.g-light .table-row-cell {
+    -fx-background-color: #313131;
+}
+
+.g-light .table-view .column-header {
+    -fx-background-color: #212121;
+}
+
+.g-light .list-view .list-cell{
+    -fx-border-color: #262626;
+    -fx-border-width: 0.5;
+    -fx-text-fill: red;
+
+}
+
+.g-light .combo-box .list-cell {
+    -fx-background-color: transparent;
+}
+
+.g-light .list-view {
+    -fx-selection-bar: #000000;
+}
+
+#listOfKeywords .list-cell {
+    -fx-text-fill: #000;
+}
