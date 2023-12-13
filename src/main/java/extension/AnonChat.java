@@ -157,7 +157,7 @@ public class AnonChat extends ExtensionForm {
                             e.printStackTrace();
                             throw new RuntimeException(e);
                         }
-                        newPacket.replaceFirstString(userMessage, message + " ª");
+                        newPacket.replaceFirstString(userMessage, message + " ª ANONCHAT");
                     }
 
                     sendToClient(newPacket);
@@ -180,13 +180,11 @@ public class AnonChat extends ExtensionForm {
             hMessage.setBlocked(true);
             new Thread(() -> {
                 waitAFckingSec(100);
-                sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage, 0, bubble, 0, -1));
+                sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage + " ª ANONCHAT", 0, bubble, 0, -1));
 
                 String fakeMessage = null;
                 try {
-                    fakeMessage = WebUtils.getRandomQuote();
-                    if (fakeMessage.length() > 120)
-                        fakeMessage = fakeMessage.substring(0, 120);
+                    fakeMessage = WebUtils.getRandomQuote(10, userMessage.length() <= 10 ? 20 : 90);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -213,7 +211,6 @@ public class AnonChat extends ExtensionForm {
             toggleCheckbox.setSelected(false);
             return;
         }
-
 
         if (toggleCheckbox.isSelected()) {
             enabled = true;

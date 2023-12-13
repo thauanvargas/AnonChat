@@ -52,10 +52,10 @@ public class WebUtils {
         return sendPostRequest("https://xeol.online/anonchat-create-message", content.toString());
     }
 
-    public static String getRandomQuote() throws IOException {
+    public static String getRandomQuote(int minLength, int maxLength) throws IOException {
 
         try {
-           JsonArray result = sendGetRequest("https://api.quotable.io/quotes/random");
+           JsonArray result = sendGetRequest("https://api.quotable.io/quotes/random?minLength=" + minLength + "&maxLength=" + maxLength);
             return result.get(0).getAsJsonObject().get("content").getAsString();
         } catch (IOException e) {
             throw new RuntimeException(e);
