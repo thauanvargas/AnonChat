@@ -45,6 +45,8 @@ public class AnonChat extends ExtensionForm {
     public Label labelLog;
     public ListView<String> usersInChatListView;
     public Label labelStatus;
+    public String host;
+
 
     @Override
     protected void onStartConnection() {
@@ -87,6 +89,10 @@ public class AnonChat extends ExtensionForm {
     @Override
     protected void initExtension() {
         RUNNING_INSTANCE = this;
+
+        onConnect((host, port, APIVersion, versionClient, client) -> {
+            this.host = host.substring(5, 7);
+        });
 
         intercept(HMessage.Direction.TOCLIENT, "UserObject", hMessage -> {
             habboId = hMessage.getPacket().readInteger();

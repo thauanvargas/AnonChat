@@ -3,6 +3,7 @@ package utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import extension.AnonChat;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -13,8 +14,22 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.TreeMap;
 
 public class WebUtils {
+
+    private static final TreeMap<String, String> codeToDomainMap = new TreeMap<>();
+    static {
+        codeToDomainMap.put("pt-br", ".com.br");
+        codeToDomainMap.put("de", ".de");
+        codeToDomainMap.put("es", ".es");
+        codeToDomainMap.put("fi", ".fi");
+        codeToDomainMap.put("fr", ".fr");
+        codeToDomainMap.put("it", ".it");
+        codeToDomainMap.put("nl", ".nl");
+        codeToDomainMap.put("tr", ".com.tr");
+        codeToDomainMap.put("en", ".com");
+    }
 
     public static JsonObject generateChat(String key, String nickname) throws IOException {
 
@@ -54,12 +69,15 @@ public class WebUtils {
 
     public static String getRandomQuote(int minLength, int maxLength) throws IOException {
 
-        try {
-           JsonArray result = sendGetRequest("https://api.quotable.io/quotes/random?minLength=" + minLength + "&maxLength=" + maxLength);
-            return result.get(0).getAsJsonObject().get("content").getAsString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        JsonObject content = new JsonObject();
+
+        content.addProperty("lang", codeToDomainMap.get(AnonChat.RUNNING_INSTANCE.host));
+        content.addProperty("minLength", minLength);
+        content.addProperty("maxLength", maxLength);
+
+        JsonObject response = sendPostRequest("https://xeol.online/anonchat-get-fake-message", content.toString());
+
+        return response.get("content").getAsString();
 
     }
 
