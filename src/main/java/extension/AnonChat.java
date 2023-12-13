@@ -20,6 +20,8 @@ import utils.WebUtils;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +30,7 @@ import java.util.TreeMap;
 @ExtensionInfo(
         Title = "AnonChat",
         Description = "Make Habbo don't see what you are typing!",
-        Version = "1.0",
+        Version = "1.1",
         Author = "Thauan"
 )
 
@@ -46,6 +48,8 @@ public class AnonChat extends ExtensionForm {
     public ListView<String> usersInChatListView;
     public Label labelStatus;
     public String host;
+    public int roomId = -1;
+//    public CheckBox noQuoteCheckbox;
 
 
     @Override
@@ -58,20 +62,22 @@ public class AnonChat extends ExtensionForm {
             sendToServer(new HPacket("InfoRetrieve", HMessage.Direction.TOSERVER));
             sendToServer(new HPacket("AvatarExpression", HMessage.Direction.TOSERVER, 0));
             sendToServer(new HPacket("GetHeightMap", HMessage.Direction.TOSERVER));
+            waitAFckingSec(1000);
+            if(roomId != -1) {
+                sendToServer(new HPacket("OpenFlatConnection", HMessage.Direction.TOSERVER, roomId, "", -1));
+            }
         }).start();
     }
 
     Timer anonChatUsers = new Timer(5000, e -> {
-        if (habboId != -1 && !Objects.equals(anonKeyTextField.getText(), "") && enabled) {
+        if (habboIndex != -1 && roomId != -1 && !Objects.equals(anonKeyTextField.getText(), "") && enabled) {
             try {
-                JsonObject result = WebUtils.generateChat(anonKeyTextField.getText(), String.valueOf(habboId));
+                JsonObject result = WebUtils.generateChat(anonKeyTextField.getText(), String.valueOf(habboIndex), roomId);
 
                 JsonArray usersOnChat = result.get("users").getAsJsonArray();
 
-                System.out.println(usersOnChat);
-
                 for (JsonElement user : usersOnChat) {
-                    Player player = users.stream().filter(u -> Objects.equals(String.valueOf(u.getPlayerId()), user.getAsString())).findFirst().orElse(null);
+                    Player player = users.stream().filter(u -> Objects.equals(String.valueOf(u.getIndex()), user.getAsString())).findFirst().orElse(null);
                     if (player != null) {
                         player.setWithKey(true);
                         if (!usersInChatListView.getItems().contains(player.getPlayerName()))
@@ -85,13 +91,28 @@ public class AnonChat extends ExtensionForm {
         }
     });
 
+    Timer noQuote = new Timer(500, e -> {
+
+    });
+
 
     @Override
     protected void initExtension() {
         RUNNING_INSTANCE = this;
 
+        intercept(HMessage.Direction.TOSERVER, "OpenFlatConnection", hMessage -> {
+            HPacket hPacket = hMessage.getPacket();
+            roomId = hPacket.readInteger();
+            usersInChatListView.getItems().clear();
+        });
+
         onConnect((host, port, APIVersion, versionClient, client) -> {
             this.host = host.substring(5, 7);
+        });
+
+        intercept(HMessage.Direction.TOCLIENT, "RoomEntryInfo", hMessage -> {
+            HPacket hPacket = hMessage.getPacket();
+            roomId = hPacket.readInteger();
         });
 
         intercept(HMessage.Direction.TOCLIENT, "UserObject", hMessage -> {
@@ -99,26 +120,7 @@ public class AnonChat extends ExtensionForm {
             habboName = hMessage.getPacket().readString();
         });
 
-        intercept(HMessage.Direction.TOCLIENT, "Users", hMessage -> {
-            try {
-                HEntity[] roomUsersList = HEntity.parse(hMessage.getPacket());
-                for (HEntity hEntity : roomUsersList) {
-                    Player player = users.stream().filter(u -> u.getPlayerId() == hEntity.getId()).findFirst().orElse(null);
-                    if (hEntity.getId() == habboId) {
-                        habboIndex = hEntity.getIndex();
-                    }else if (player != null) {
-                        player.setPlayerId(hEntity.getId());
-                        player.setIndex(hEntity.getIndex());
-                        player.setPlayerName(hEntity.getName());
-                    } else {
-                        Player user = new Player(hEntity.getId(), hEntity.getName(), hEntity.getIndex());
-                        users.add(user);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        intercept(HMessage.Direction.TOCLIENT, "Users", this::checkUsers);
 
         intercept(HMessage.Direction.TOCLIENT, "Chat", this::processIncomingChat);
 
@@ -144,7 +146,7 @@ public class AnonChat extends ExtensionForm {
         if (enabled) {
             HPacket hPacket = hMessage.getPacket();
             int userIndex = hPacket.readInteger();
-            String userMessage = hPacket.readString();
+            String userMessage = hPacket.readString(StandardCharsets.UTF_8);
             String expression = hPacket.toExpression();
 
             hMessage.setBlocked(true);
@@ -153,17 +155,17 @@ public class AnonChat extends ExtensionForm {
                 new Thread(() -> {
                     Player player = users.stream().filter(u -> u.getIndex() == userIndex).findFirst().orElse(null);
 
-                    String message = userMessage;
+                    String message;
                     HPacket newPacket = new HPacket(expression);
 
                     if (player != null && player.isWithKey()) {
                         try {
-                            message = WebUtils.fetchMessage(anonKeyTextField.getText(), userMessage);
+                            message = WebUtils.fetchMessage(anonKeyTextField.getText(), userMessage, roomId);
                         } catch (IOException e) {
                             e.printStackTrace();
                             throw new RuntimeException(e);
                         }
-                        newPacket.replaceFirstString(userMessage, message + " ª ANONCHAT");
+                        newPacket.replaceString(10, message + " ª ANONCHAT");
                     }
 
                     sendToClient(newPacket);
@@ -177,32 +179,30 @@ public class AnonChat extends ExtensionForm {
     public void processOutgoingChat(HMessage hMessage, String type) {
         if (enabled) {
             HPacket hPacket = hMessage.getPacket();
-            String userMessage = hPacket.readString();
+            String userMessage = hPacket.readString(StandardCharsets.UTF_8);
             int bubble = hPacket.readInteger();
 
             String expression = hPacket.toExpression();
 
-
             hMessage.setBlocked(true);
             new Thread(() -> {
                 waitAFckingSec(100);
+
                 sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage + " ª ANONCHAT", 0, bubble, 0, -1));
 
                 String fakeMessage = null;
                 try {
-                    fakeMessage = WebUtils.getRandomQuote(10, userMessage.length() <= 10 ? 20 : 90);
+                    fakeMessage = WebUtils.getRandomQuote(10, userMessage.length() <= 10 ? 30 : 90);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
                 HPacket newPacket = new HPacket(expression);
-
-                newPacket.replaceFirstString(userMessage, fakeMessage);
-
+                newPacket.replaceString(6, fakeMessage, StandardCharsets.UTF_8);
                 sendToServer(newPacket);
 
                 try {
-                    WebUtils.createMessage(anonKeyTextField.getText(), userMessage, fakeMessage);
+                    WebUtils.createMessage(anonKeyTextField.getText(), userMessage, fakeMessage, roomId);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -243,6 +243,26 @@ public class AnonChat extends ExtensionForm {
         }
     }
 
+    public void checkUsers(HMessage hMessage) {
+        try {
+            HEntity[] roomUsersList = HEntity.parse(hMessage.getPacket());
+            for (HEntity hEntity : roomUsersList) {
+                Player player = users.stream().filter(u -> u.getPlayerId() == hEntity.getId()).findFirst().orElse(null);
+                if (hEntity.getId() == habboId) {
+                    habboIndex = hEntity.getIndex();
+                }else if (player != null) {
+                    player.setPlayerId(hEntity.getId());
+                    player.setIndex(hEntity.getIndex());
+                    player.setPlayerName(hEntity.getName());
+                } else {
+                    Player user = new Player(hEntity.getId(), hEntity.getName(), hEntity.getIndex());
+                    users.add(user);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void waitAFckingSec(int millisecActually) {
         try {

@@ -34,6 +34,6 @@
       <Label layoutX="123.0" layoutY="244.0" text="Type a secret key that only you and your friends will know" />
       <ListView fx:id="usersInChatListView" layoutX="39.0" layoutY="61.0" prefHeight="162.0" prefWidth="113.0" />
       <Label layoutX="39.0" layoutY="37.0" text="Users in your chat:" />
-<!--      <CheckBox fx:id="toggleCheckbox1" layoutX="372.0" layoutY="274.0" mnemonicParsing="false" onAction="#toggleStatus" text="Don't Quote" />-->
+<!--      <CheckBox fx:id="noQuoteCheckbox" layoutX="372.0" layoutY="274.0" mnemonicParsing="false" onAction="#toggleStatus" text="Don't Quote" />-->
    </children>
 </AnchorPane>

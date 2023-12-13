@@ -22,7 +22,7 @@ public class AnonChatLauncher extends ThemedExtensionFormCreator {
         primaryStage.setTitle("AnonChat v" + AnonChat.class.getAnnotation(ExtensionInfo.class).Version());
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
-//        primaryStage.setAlwaysOnTop(true);
+        primaryStage.setAlwaysOnTop(true);
         primaryStage.getIcons().add(new Image("icon.png"));
 
         return loader.getController();
