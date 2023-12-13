@@ -38,7 +38,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>AnonChatLauncher</mainClass>
+                            <mainClass>extension/AnonChatLauncher</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                             <classpathPrefix>lib/</classpathPrefix>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -63,7 +63,7 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>AnonChatLauncher</mainClass>
+                            <mainClass>extension/AnonChatLauncher</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
