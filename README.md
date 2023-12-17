@@ -34,6 +34,10 @@ Welcome to AnonChat, the G-Earth Habbo Extension ("Extension"). By using this Ex
  - RoomID
  - User Index
 
+- OBS:
+We shouldn't be able to tell which user is sending each message, as the User Index are not global variables, they keep changing everytime you re-enter the room
+
+
 ## 3. Data Usage:
 
 - The collected data is used for the purpose of enhancing AnonChat's functionality and providing features such as auto translation and anonimity.
