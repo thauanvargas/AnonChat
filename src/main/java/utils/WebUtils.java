@@ -52,7 +52,11 @@ public class WebUtils {
         content.addProperty("message", message);
         content.addProperty("room", room);
 
+        System.out.println(content);
+
         JsonObject result = sendPostRequest("https://xeol.online/anonchat-fetch-message", content.toString());
+
+        System.out.println(result);
 
         return result.get("realMessage").getAsString();
 

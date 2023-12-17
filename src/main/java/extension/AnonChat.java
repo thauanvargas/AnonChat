@@ -30,7 +30,7 @@ import java.util.TreeMap;
 @ExtensionInfo(
         Title = "AnonChat",
         Description = "Make Habbo don't see what you are typing!",
-        Version = "1.1",
+        Version = "1.2",
         Author = "Thauan"
 )
 
@@ -153,10 +153,13 @@ public class AnonChat extends ExtensionForm {
             if (userIndex != habboIndex) {
 
                 new Thread(() -> {
+                    waitAFckingSec(300);
                     Player player = users.stream().filter(u -> u.getIndex() == userIndex).findFirst().orElse(null);
 
+                    System.out.println(userMessage);
                     String message;
                     HPacket newPacket = new HPacket(expression);
+
 
                     if (player != null && player.isWithKey()) {
                         try {
@@ -186,10 +189,6 @@ public class AnonChat extends ExtensionForm {
 
             hMessage.setBlocked(true);
             new Thread(() -> {
-                waitAFckingSec(100);
-
-                sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage + " ª ANONCHAT", 0, bubble, 0, -1));
-
                 String fakeMessage = null;
                 try {
                     fakeMessage = WebUtils.getRandomQuote(10, userMessage.length() <= 10 ? 30 : 90);
@@ -206,6 +205,10 @@ public class AnonChat extends ExtensionForm {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
+                waitAFckingSec(100);
+                sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage + " ª ANONCHAT", 0, bubble, 0, -1));
+
 
 
             }).start();
