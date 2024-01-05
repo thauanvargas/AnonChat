@@ -34,7 +34,7 @@ Welcome to AnonChat, the G-Earth Habbo Extension ("Extension"). By using this Ex
  - RoomID
  - User Index
 
-- OBS:
+**OBS:**
 We shouldn't be able to tell which user is sending each message, as the User Index are not global variables, they keep changing everytime you re-enter the room
 
 

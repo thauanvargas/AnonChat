@@ -30,7 +30,7 @@ import java.util.TreeMap;
 @ExtensionInfo(
         Title = "AnonChat",
         Description = "Make Habbo don't see what you are typing!",
-        Version = "1.2",
+        Version = "1.3",
         Author = "Thauan"
 )
 
@@ -91,9 +91,10 @@ public class AnonChat extends ExtensionForm {
         }
     });
 
-    Timer noQuote = new Timer(500, e -> {
-
-    });
+    // TODO: NEW FEATURE TO DON'T QUOTE
+//    Timer noQuote = new Timer(500, e -> {
+//
+//    });
 
 
     @Override
@@ -153,13 +154,10 @@ public class AnonChat extends ExtensionForm {
             if (userIndex != habboIndex) {
 
                 new Thread(() -> {
-                    waitAFckingSec(300);
                     Player player = users.stream().filter(u -> u.getIndex() == userIndex).findFirst().orElse(null);
 
-                    System.out.println(userMessage);
                     String message;
                     HPacket newPacket = new HPacket(expression);
-
 
                     if (player != null && player.isWithKey()) {
                         try {
@@ -189,6 +187,9 @@ public class AnonChat extends ExtensionForm {
 
             hMessage.setBlocked(true);
             new Thread(() -> {
+
+                sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage + " ª ANONCHAT", 0, bubble, 0, -1));
+
                 String fakeMessage = null;
                 try {
                     fakeMessage = WebUtils.getRandomQuote(10, userMessage.length() <= 10 ? 30 : 90);
@@ -196,18 +197,16 @@ public class AnonChat extends ExtensionForm {
                     throw new RuntimeException(e);
                 }
 
-                HPacket newPacket = new HPacket(expression);
-                newPacket.replaceString(6, fakeMessage, StandardCharsets.UTF_8);
-                sendToServer(newPacket);
 
                 try {
                     WebUtils.createMessage(anonKeyTextField.getText(), userMessage, fakeMessage, roomId);
+                    HPacket newPacket = new HPacket(expression);
+                    newPacket.replaceString(6, fakeMessage, StandardCharsets.UTF_8);
+                    sendToServer(newPacket);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
-                waitAFckingSec(100);
-                sendToClient(new HPacket(type, HMessage.Direction.TOCLIENT, habboIndex, userMessage + " ª ANONCHAT", 0, bubble, 0, -1));
 
 
 
