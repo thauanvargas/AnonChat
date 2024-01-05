@@ -20,7 +20,7 @@ currently, my api is located at the url https://xeol.online
 
 **Last Updated: 17/12/2023**
 
-Welcome to AnonChat, the G-Earth Habbo Extension ("Extension"). By using this Extension, you agree to comply with and be bound by the following terms and conditions. Please read these terms carefully before using the Extension.
+Welcome to AnonChat, a Anonymous Chat G-Earth Habbo Extension. By using this Extension, you agree to comply with and be bound by the following terms and conditions. Please read these terms carefully before using the Extension.
 
 ## 1. API Connection:
 
