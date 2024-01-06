@@ -16,11 +16,13 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class WebUtils {
 
-    private static final TreeMap<String, String> codeToLangMap = new TreeMap<>();
+    public static final TreeMap<String, String> codeToLangMap = new TreeMap<>();
+
     static {
         codeToLangMap.put("br", "pt-br");
         codeToLangMap.put("de", "de");
@@ -52,11 +54,7 @@ public class WebUtils {
         content.addProperty("message", message);
         content.addProperty("room", room);
 
-        System.out.println(content);
-
         JsonObject result = sendPostRequest("https://xeol.online/anonchat-fetch-message", content.toString());
-
-        System.out.println(result);
 
         return result.get("realMessage").getAsString();
 
@@ -78,7 +76,12 @@ public class WebUtils {
 
         JsonObject content = new JsonObject();
 
-        content.addProperty("lang", codeToLangMap.get(AnonChat.RUNNING_INSTANCE.host));
+        if(Objects.equals(AnonChat.RUNNING_INSTANCE.host, "")) {
+            content.addProperty("lang", codeToLangMap.get(AnonChat.RUNNING_INSTANCE.languageChoiceBox.getValue()));
+        }else {
+            content.addProperty("lang", codeToLangMap.get(AnonChat.RUNNING_INSTANCE.host));
+        }
+
         content.addProperty("minLength", minLength);
         content.addProperty("maxLength", maxLength);
 

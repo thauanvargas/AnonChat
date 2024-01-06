@@ -10,27 +10,22 @@ import gearth.extensions.parsers.*;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import javafx.application.Platform;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import utils.WebUtils;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
 @ExtensionInfo(
         Title = "AnonChat",
         Description = "Make Habbo don't see what you are typing!",
-        Version = "1.3",
+        Version = "1.4",
         Author = "Thauan"
 )
 
@@ -49,8 +44,9 @@ public class AnonChat extends ExtensionForm {
     public Label labelStatus;
     public String host;
     public int roomId = -1;
+    public Label labelLanguage;
+    public ChoiceBox<String> languageChoiceBox;
 //    public CheckBox noQuoteCheckbox;
-
 
     @Override
     protected void onStartConnection() {
@@ -58,6 +54,19 @@ public class AnonChat extends ExtensionForm {
 
     @Override
     protected void onShow() {
+
+        if(Objects.equals(this.host, "")) {
+            WebUtils.codeToLangMap.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .forEach(o -> {
+                        languageChoiceBox.getItems().add(o.getKey());
+                    });
+            languageChoiceBox.setValue("en");
+        }else {
+            languageChoiceBox.setVisible(false);
+            labelLanguage.setVisible(false);
+        }
+
         new Thread(() -> {
             sendToServer(new HPacket("InfoRetrieve", HMessage.Direction.TOSERVER));
             sendToServer(new HPacket("AvatarExpression", HMessage.Direction.TOSERVER, 0));
@@ -108,7 +117,11 @@ public class AnonChat extends ExtensionForm {
         });
 
         onConnect((host, port, APIVersion, versionClient, client) -> {
-            this.host = host.substring(5, 7);
+            try {
+                this.host = host.substring(5, 7);
+            }catch (Exception err) {
+                this.host = "";
+            }
         });
 
         intercept(HMessage.Direction.TOCLIENT, "RoomEntryInfo", hMessage -> {
